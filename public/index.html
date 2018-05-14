@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Online File Watcher</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px 'Source Sans Pro', Verdana, Arial, sans-serif; }
+      ul { display: inline; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; font-family: monospace; white-space: pre-wrap; word-wrap: normal; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      var lineNumber = 0;
+      var followTail = true;
+      var showLineNumber = true;
+      var $view = $('#messages');
+      function appendAsMessages(content) {
+        content.split('\n').forEach(function (line, index) {
+          if (index === 0 && $view.children().size() > 0) {
+            var tail = $view.find(':last-child');
+            tail.text(tail.text() + line);
+          } else {
+            lineNumber++;
+            if (showLineNumber) {
+              $view.append($('<li>').text('[' + lineNumber + '] ' + line));
+            } else {
+              $view.append($('<li>').text(line));
+            }
+            if (followTail) {
+              window.scrollTo(0, document.body.scrollHeight);
+            }
+          }
+        });
+      }
+      function watchFile(filename) {
+        var socket = io();
+        socket.emit('watch_file', filename);
+        socket.on('file_delta', appendAsMessages);
+      }
+      $(function () {
+        var filename = prompt('File to watch?', 'logs/server.log');
+        var url = '/inspect/' + filename;
+        $.ajax({
+          method: 'GET',
+          url: url,
+        })
+        .done(function (file) {
+          appendAsMessages(file);
+          watchFile(filename);
+        })
+        .fail(function (msg) {
+          window.location = url;
+        });
+      });
+    </script>
+  </body>
+</html>
