@@ -7,7 +7,7 @@
       body { font: 13px 'Source Sans Pro', Verdana, Arial, sans-serif; }
       ul { display: inline; }
       #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; font-family: monospace; white-space: pre-wrap; word-wrap: normal; }
+      #messages li { padding: 5px 10px; font-family: monospace; white-space: pre-wrap; word-wrap: break-word; }
       #messages li:nth-child(odd) { background: #eee; }
     </style>
   </head>
@@ -16,22 +16,15 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
-      var lineNumber = 0;
-      var followTail = true;
-      var showLineNumber = true;
       var $view = $('#messages');
       function appendAsMessages(content) {
+        var followTail = ($(window).scrollTop() + $(window).height() === $(document).height());
         content.split('\n').forEach(function (line, index) {
           if (index === 0 && $view.children().size() > 0) {
             var tail = $view.find(':last-child');
             tail.text(tail.text() + line);
           } else {
-            lineNumber++;
-            if (showLineNumber) {
-              $view.append($('<li>').text('[' + lineNumber + '] ' + line));
-            } else {
-              $view.append($('<li>').text(line));
-            }
+            $view.append($('<li>').text(line));
             if (followTail) {
               window.scrollTo(0, document.body.scrollHeight);
             }
