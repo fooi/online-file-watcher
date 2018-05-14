@@ -38,14 +38,19 @@
       }
       $(function () {
         var filename = prompt('File to watch?', 'logs/server.log');
+        var watchTailOnly = confirm('Watch tail only?');
         var url = '/inspect/' + filename;
+	if (watchTailOnly) {
+          appendAsMessages('You are watching ' + filename + '\n');
+          watchFile(filename);
+          return;
+        }
         $.ajax({
           method: 'GET',
           url: url,
         })
         .done(function (file) {
           appendAsMessages(file);
-          watchFile(filename);
         })
         .fail(function (msg) {
           window.location = url;
