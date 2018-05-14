@@ -23,7 +23,6 @@ function watchFile(fileId, socket) {
     });
     file2Watcher[fileId] = watcher;
     file2Sockets[fileId] = [socket];
-    console.log('watch: ' + fileId);
   }
 }
 
@@ -35,7 +34,6 @@ function unwatchFile(fileId, socket) {
       file2Watcher[fileId].unwatch();
       delete file2Watcher[fileId];
       delete file2Sockets[fileId];
-      console.log('unwatch: ' + fileId);
     }
   }
 }

@@ -4,7 +4,7 @@ var createError = require('http-errors');
 var logger = require('morgan');
 var events = require('events');
 
-var indexRouter = require('./routes/index');
+// var indexRouter = require('./routes/index');
 var inspectRouter = require('./routes/inspect');
 
 var app = express();
@@ -14,9 +14,10 @@ app.use(express.json());
 app.use(express.urlencoded({
   extended: false
 }));
+app.use(express.static(path.join(__dirname, 'client/dist')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+// app.use('/', indexRouter);
 app.use('/inspect', inspectRouter);
 
 // catch 404 and forward to error handler
@@ -30,7 +31,7 @@ app.use(function (err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  res.redirect('/', err.status || 500);
+  res.redirect(err.status || 500, '/');
 });
 
 module.exports = app;

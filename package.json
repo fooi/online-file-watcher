@@ -3,7 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "dev": "concurrently --kill-others \"npm run dev-client\" \"npm run dev-server\"",
+    "dev-server": "nodemon --inspect ./bin/www",
+    "dev-client": "cd ./client && ng build --watch",
+    "install-all": "npm install && cd ./client && npm install"
   },
   "dependencies": {
     "debug": "~2.6.9",
@@ -11,5 +15,9 @@
     "http-errors": "~1.6.2",
     "morgan": "~1.9.0",
     "socket.io": "^2.1.0"
+  },
+  "devDependencies": {
+    "concurrently": "^3.5.1",
+    "nodemon": "^1.17.4"
   }
 }
