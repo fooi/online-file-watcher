@@ -1,13 +1,8 @@
 var path = require('path');
 var Server = require('socket.io');
-var textDecoder = new (require('util').TextDecoder)('utf-8');
 
 var FileWatcher = require('./file-watcher');
 var appfs = require('./app-fs');
-
-function decode(input, options) {
-  return textDecoder.decode(input, options);
-}
 
 var file2Watcher = {};
 var file2Sockets = {};
@@ -19,7 +14,7 @@ function watchFile(fileId, socket) {
     var filePath = appfs.resolvePath(fileId);
     var watcher = file2Watcher[fileId] || new FileWatcher(filePath);
     watcher.watch().getEmitter().addListener('file_delta', function (chunk) {
-      socket.server.to(fileId).emit('file_delta', decode(chunk));
+      socket.server.to(fileId).emit('file_delta', chunk);
     });
     file2Watcher[fileId] = watcher;
     file2Sockets[fileId] = [socket];

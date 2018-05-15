@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import io from 'socket.io-client';
+import * as io from 'socket.io-client';
 
 @Component({
   selector: 'app-root',
@@ -10,7 +10,7 @@ import io from 'socket.io-client';
 export class AppComponent implements OnInit {
 
   constructor() {
-
+    const socket = io();
   }
 
   ngOnInit(): void {

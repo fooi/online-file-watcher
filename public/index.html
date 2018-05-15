@@ -40,7 +40,7 @@
         var filename = prompt('File to watch?', 'logs/server.log');
         var watchTailOnly = confirm('Watch tail only?');
         var url = '/inspect/' + filename;
-	if (watchTailOnly) {
+	      if (watchTailOnly) {
           appendAsMessages('You are watching ' + filename + '\n');
           watchFile(filename);
           return;

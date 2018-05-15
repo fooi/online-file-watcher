@@ -6,66 +6,62 @@ var router = express.Router();
 
 var appfs = require('../app-fs');
 
-/* GET home page. */
-router.get(/\/(.*)/, function(req, res, next) {
+function walk(folderPath, options) {
+  if (!fs.existsSync(folderPath)) {}
+  if (!fs.statSync(folderPath).isDirectory()) {}
+
+  var opt = Object.assign({
+    excludes: [],
+    recursive: false,
+    absolute: false,
+    basePath: '',
+  }, options);
+
+  var directories = [];
+  var files = [];
+
+  fs.readdirSync(folderPath)
+    .filter(itemName => opt.excludes.every(pattern => !pattern.test(itemName)))
+    .forEach(itemName => {
+      var itemPath = path.join(folderPath, itemName);
+      var itemStats = fs.statSync(itemPath);
+      if (itemStats.isDirectory()) {
+        var itemDisplayPath = opt.absolute ? path.resolve(itemPath) : path.join(opt.basePath, itemName);
+        directories.push(itemDisplayPath);
+        if (opt.recursive) {
+          var innerWalk = walk(itemPath, Object.assign({}, opt, {
+            basePath: itemDisplayPath
+          }));
+          directories.push(innerWalk.directories);
+          files.push(innerWalk.files);
+        }
+      } else if (itemStats.isFile()) {
+        files.push(opt.absolute ? path.resolve(itemPath) : path.join(opt.basePath, itemName));
+      }
+    });
+
+  return {
+    id: folderPath,
+    directories: directories,
+    files: files,
+  };
+}
+
+router.get(/\/(.*)/, function (req, res, next) {
   var targetPath = appfs.resolvePath(req.params[0]);
   if (fs.existsSync(targetPath)) {
     var targetStats = fs.statSync(targetPath);
     if (targetStats.isDirectory()) {
-      var directories = [];
-      var files = [];
-      fs.readdirSync(targetPath).forEach(function (subTarget) {
-        var subTargetStats = fs.statSync(path.join(targetPath, subTarget));
-        if (subTargetStats.isDirectory()) {
-          directories.push(subTarget);
-        } else if (subTargetStats.isFile()) {
-          files.push(subTarget);
-        }
-      });
-      res.json({
-        directories: directories,
-        files: files,
-      });
+      res.json(walk(targetPath));
     } else if (targetStats.isFile()) {
-      countLines(targetPath).then(function (lineCount) {
-        var options = {
-          headers: {
-            'Content-Lines': lineCount
-          },
-          dotfiles: 'allow',
-        };
-        res.sendFile(targetPath, options, function (err) {
-          if (err) {
-            next(err);
-          }
-        });
-      });
+      fs.createReadStream(targetPath, {
+          encoding: 'utf-8'
+        })
+        .pipe(res);
     }
   } else {
     next(createError(400));
   }
 });
-
-/**
- * Count number of lines of a file.
- */
-
-function countLines(filePath) {
-  return new Promise(function (resolve, reject) {
-    var i;
-    var count = 1;
-    fs.createReadStream(filePath)
-      .on('data', function (chunk) {
-        for (i = 0; i < chunk.length; i++) {
-          if (chunk[i] == 10) {
-            count++;
-          }
-        }
-      })
-      .on('end', function () {
-        resolve(count);
-      });
-  });
-}
 
 module.exports = router;

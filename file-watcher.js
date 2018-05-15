@@ -2,6 +2,8 @@ var fs = require('fs');
 var path = require('path');
 var events = require('events');
 
+var READABLE_BUFFER_SIZE = 16 * 1024; // 16kb
+
 function getWatchThrottleDelay() {
   var delay = parseInt(process.env.THROTTLE_DELAY || '1000');
   if (delay <= 0) {
@@ -21,7 +23,7 @@ function FileWatcher(filePath) {
 
   var listener = function (curr, prev) {
     if (curr.mtime > prev.mtime) {
-      fs.createReadStream(filePath, { start: prev.size })
+      fs.createReadStream(filePath, { start: prev.size, encoding: 'utf-8', highWaterMark: READABLE_BUFFER_SIZE })
         .on('data', function (chunk) {
           emitter.emit('file_delta', chunk);
         });
