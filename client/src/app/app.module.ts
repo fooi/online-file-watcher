@@ -8,11 +8,13 @@ import { TreeModule } from 'primeng/tree';
 
 import { AppComponent } from './app.component';
 import { DirectoryInspectorComponent } from './directory-inspector/directory-inspector.component';
+import { FileWatcherComponent } from './file-watcher/file-watcher.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     DirectoryInspectorComponent,
+    FileWatcherComponent,
   ],
   imports: [
     BrowserModule,

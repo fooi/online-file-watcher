@@ -41,7 +41,6 @@ function walk(folderPath, options) {
     });
 
   return {
-    id: folderPath,
     directories: directories,
     files: files,
   };

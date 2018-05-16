@@ -1,4 +1,4 @@
-<p-tree [value]="items" (onNodeExpand)="loadNode($event)" selectionMode="single" [(selection)]="selectedItem" [contextMenu]="cm"
-  [loading]="loading" layout="horizontal">
+<p-tree [value]="items" (onNodeSelect)="nodeSelect($event)" (onNodeExpand)="nodeExpand($event)" selectionMode="single" [(selection)]="selectedItem" [contextMenu]="cm"
+  [loading]="loading">
 </p-tree>
 <p-contextMenu #cm [model]="menuItems"></p-contextMenu>
